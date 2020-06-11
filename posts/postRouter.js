@@ -10,6 +10,7 @@ const {
 const DB = require("./postDb");
 const router = express.Router();
 
+//GET ALL POSTS
 router.get("/", (req, res) => {
   // do your magic!
   DB.get()
@@ -17,10 +18,12 @@ router.get("/", (req, res) => {
     .catch((err) => res.status(500).json("sum ting wong"));
 });
 
+// GET POST BY ID
 router.get("/:id", validatePostId, (req, res) => {
   res.status(200).json(req.post);
 });
 
+// ADD NEW POST
 router.post("/", validatePost, async (req, res) => {
   const post = await DB.insert(req.body);
   if (post) {
@@ -29,6 +32,7 @@ router.post("/", validatePost, async (req, res) => {
   res.status(500).json("Oof.");
 });
 
+// DELETE POST BY ID
 router.delete("/:id", validatePostId, async (req, res) => {
   const post = await DB.remove(req.post.id);
   if (post > 0) {
@@ -37,6 +41,7 @@ router.delete("/:id", validatePostId, async (req, res) => {
   res.status(404).json({ message: "No post removed" });
 });
 
+// EDIT POST BY ID
 router.put("/:id", validatePost, async (req, res) => {
   const post = await DB.update(req.params.id, req.body);
   if (post > 0) {

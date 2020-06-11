@@ -5,6 +5,7 @@ const { validateUserId, validateUser, validatePost } = require("../middleware");
 const DB = require("./userDb");
 const router = express.Router();
 
+// ADD NEW USER
 router.post("/", validateUser, async (req, res) => {
   try {
     const user = await DB.insert(req.body);
@@ -22,6 +23,7 @@ router.post("/", validateUser, async (req, res) => {
   }
 });
 
+//ADD POST BY USER ID
 router.post("/:id/posts", validateUserId, async (req, res) => {
   const posts = await DB.getUserPosts(req.params.id);
   if (posts) {
@@ -30,6 +32,7 @@ router.post("/:id/posts", validateUserId, async (req, res) => {
   res.status(404).json({ message: "no posts!" });
 });
 
+// GET ALL USERS
 router.get("/", async (req, res) => {
   const users = await DB.get();
   if (users) {
@@ -38,6 +41,7 @@ router.get("/", async (req, res) => {
   res.status(404).json({ message: "Nada" });
 });
 
+// GET USER BY ID
 router.get("/:id", validateUserId, (req, res) => {
   if (res.user) {
     return res.status(200).json(res.user);
@@ -45,6 +49,7 @@ router.get("/:id", validateUserId, (req, res) => {
   return res.status(500).json("Splat!");
 });
 
+// GET POSTS BY USER ID
 router.get("/:id/posts", validateUserId, async (req, res) => {
   const posts = await DB.getUserPosts(req.params.id);
   if (posts) {
@@ -55,6 +60,7 @@ router.get("/:id/posts", validateUserId, async (req, res) => {
   res.status(500).json("Oops~");
 });
 
+// DELETE USER
 router.delete("/:id", validateUserId, async (req, res) => {
   const removeCount = await DB.remove(req.params.id);
   if (removeCount > 0) {
@@ -63,6 +69,7 @@ router.delete("/:id", validateUserId, async (req, res) => {
   res.status(500).json("Houston, we have a problem.");
 });
 
+// EDIT USER
 router.put("/:id", async (req, res) => {
   const updateCount = await DB.update(req.params.id, req.body);
   if (updateCount > 0) {
