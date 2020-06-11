@@ -1,47 +1,81 @@
-const express = require('express');
+const express = require("express");
 
+const { validateUserId, validateUser, validatePost } = require("../middleware");
+
+const DB = require("./userDb");
 const router = express.Router();
 
-router.post('/', (req, res) => {
-  // do your magic!
+// ADD NEW USER
+router.post("/", validateUser, async (req, res) => {
+  try {
+    const user = await DB.insert(req.body);
+    if (user) {
+      return res.status(201).json(user);
+    }
+  } catch (e) {
+    if (e.code === `SQLITE_CONSTRAINT`) {
+      const user = await DB.getByName(req.body.name);
+      if (user) {
+        return res.status(201).json(user);
+      }
+    }
+    res.status(500).json("Self-destruct sequence activated.");
+  }
 });
 
-router.post('/:id/posts', (req, res) => {
-  // do your magic!
+//ADD POST BY USER ID
+router.post("/:id/posts", validateUserId, async (req, res) => {
+  const posts = await DB.getUserPosts(req.params.id);
+  if (posts) {
+    return res.status(201).json(posts);
+  }
+  res.status(404).json({ message: "no posts!" });
 });
 
-router.get('/', (req, res) => {
-  // do your magic!
+// GET ALL USERS
+router.get("/", async (req, res) => {
+  const users = await DB.get();
+  if (users) {
+    return res.status(200).json(users);
+  }
+  res.status(404).json({ message: "No user found" });
 });
 
-router.get('/:id', (req, res) => {
-  // do your magic!
+// GET USER BY ID
+router.get("/:id", validateUserId, (req, res) => {
+  if (res.user) {
+    return res.status(200).json(res.user);
+  }
+  return res.status(500).json("Something went wrong!");
 });
 
-router.get('/:id/posts', (req, res) => {
-  // do your magic!
+// GET POSTS BY USER ID
+router.get("/:id/posts", validateUserId, async (req, res) => {
+  const posts = await DB.getUserPosts(req.params.id);
+  if (posts) {
+    return res.status(200).json(posts);
+  } else {
+    return res.status(404).json("no post found");
+  }
+  res.status(500).json("something went wrong");
 });
 
-router.delete('/:id', (req, res) => {
-  // do your magic!
+// DELETE USER
+router.delete("/:id", validateUserId, async (req, res) => {
+  const removeCount = await DB.remove(req.params.id);
+  if (removeCount > 0) {
+    return res.status(201).json(`${removeCount} user(s) has been removed`);
+  }
+  res.status(500).json("Sorry, there was a problem.");
 });
 
-router.put('/:id', (req, res) => {
-  // do your magic!
+// EDIT USER
+router.put("/:id", async (req, res) => {
+  const updateCount = await DB.update(req.params.id, req.body);
+  if (updateCount > 0) {
+    return res.status(201).json(`${updateCount} user(s) has been updated`);
+  }
+  res.status(500).json("Critical error!");
 });
-
-//custom middleware
-
-function validateUserId(req, res, next) {
-  // do your magic!
-}
-
-function validateUser(req, res, next) {
-  // do your magic!
-}
-
-function validatePost(req, res, next) {
-  // do your magic!
-}
 
 module.exports = router;

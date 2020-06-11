@@ -1,27 +1,53 @@
-const express = require('express');
+const express = require("express");
 
+const {
+  validateUserId,
+  validateUser,
+  validatePost,
+  validatePostId,
+} = require("../middleware");
+
+const DB = require("./postDb");
 const router = express.Router();
 
-router.get('/', (req, res) => {
+//GET ALL POSTS
+router.get("/", (req, res) => {
   // do your magic!
+  DB.get()
+    .then((response) => res.status(200).json(response))
+    .catch((err) => res.status(500).json("something went wrong"));
 });
 
-router.get('/:id', (req, res) => {
-  // do your magic!
+// GET POST BY ID
+router.get("/:id", validatePostId, (req, res) => {
+  res.status(200).json(req.post);
 });
 
-router.delete('/:id', (req, res) => {
-  // do your magic!
+// ADD NEW POST
+router.post("/", validatePost, async (req, res) => {
+  const post = await DB.insert(req.body);
+  if (post) {
+    return res.status(201).json(post);
+  }
+  res.status(500).json("Error retrieving data.");
 });
 
-router.put('/:id', (req, res) => {
-  // do your magic!
+// DELETE POST BY ID
+router.delete("/:id", validatePostId, async (req, res) => {
+  const post = await DB.remove(req.post.id);
+  if (post > 0) {
+    return res.status(201).json(`${post} post has been removed`);
+  }
+  res.status(404).json({ message: "No post removed" });
 });
 
-// custom middleware
-
-function validatePostId(req, res, next) {
-  // do your magic!
-}
+// EDIT POST BY ID
+router.put("/:id", validatePost, async (req, res) => {
+  const post = await DB.update(req.params.id, req.body);
+  if (post > 0) {
+    return res.status(201).json(`${post} post has been Updated`);
+  }
+  res.status(404).json({ message: "No post updated" });
+});
 
 module.exports = router;
