@@ -38,7 +38,7 @@ router.get("/", async (req, res) => {
   if (users) {
     return res.status(200).json(users);
   }
-  res.status(404).json({ message: "Nada" });
+  res.status(404).json({ message: "No user found" });
 });
 
 // GET USER BY ID
@@ -46,7 +46,7 @@ router.get("/:id", validateUserId, (req, res) => {
   if (res.user) {
     return res.status(200).json(res.user);
   }
-  return res.status(500).json("Splat!");
+  return res.status(500).json("Something went wrong!");
 });
 
 // GET POSTS BY USER ID
@@ -55,9 +55,9 @@ router.get("/:id/posts", validateUserId, async (req, res) => {
   if (posts) {
     return res.status(200).json(posts);
   } else {
-    return res.status(404).json("Where did the posts go?");
+    return res.status(404).json("no post found");
   }
-  res.status(500).json("Oops~");
+  res.status(500).json("something went wrong");
 });
 
 // DELETE USER
@@ -66,7 +66,7 @@ router.delete("/:id", validateUserId, async (req, res) => {
   if (removeCount > 0) {
     return res.status(201).json(`${removeCount} user(s) has been removed`);
   }
-  res.status(500).json("Houston, we have a problem.");
+  res.status(500).json("Sorry, there was a problem.");
 });
 
 // EDIT USER

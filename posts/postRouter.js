@@ -15,7 +15,7 @@ router.get("/", (req, res) => {
   // do your magic!
   DB.get()
     .then((response) => res.status(200).json(response))
-    .catch((err) => res.status(500).json("sum ting wong"));
+    .catch((err) => res.status(500).json("something went wrong"));
 });
 
 // GET POST BY ID
@@ -29,7 +29,7 @@ router.post("/", validatePost, async (req, res) => {
   if (post) {
     return res.status(201).json(post);
   }
-  res.status(500).json("Oof.");
+  res.status(500).json("Error retrieving data.");
 });
 
 // DELETE POST BY ID

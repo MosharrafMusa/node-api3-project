@@ -50,7 +50,7 @@ async function validatePostId(req, res, next) {
   } else {
     return res.status(404).json({ message: "Post is not found" });
   }
-  res.status(500).json({ message: "uh oh!" });
+  res.status(500).json({ message: "Error retrieving data!" });
 }
 
 module.exports = {
